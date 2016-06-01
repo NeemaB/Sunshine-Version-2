@@ -1,5 +1,6 @@
 package com.example.android.sunshine.app;
 
+import java.util.ArrayList;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -57,6 +58,17 @@ public class MainActivity extends ActionBarActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+
+            ArrayList<String> forecastItems = new ArrayList<String>();
+
+            forecastItems.add("Today-Sunny-88/63");
+            forecastItems.add("Tomorrow-Cloudy-68/54");
+            forecastItems.add("Wednesday-Rainy-60/49");
+            forecastItems.add("Thursday-Cloudy-65/56");
+            forecastItems.add("Friday-Sunny-94/77");
+            forecastItems.add("Saturday-Cloudy-75/63");
+            forecastItems.add("Sunday-Rainy-59/45");
+
             return rootView;
         }
     }
