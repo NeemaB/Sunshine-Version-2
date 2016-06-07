@@ -1,14 +1,10 @@
 package com.example.android.sunshine.app;
 
-import java.util.ArrayList;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.view.LayoutInflater;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -17,11 +13,19 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        ActionBar ab = getSupportActionBar();
+        ab.setIcon(R.mipmap.ic_launcher);
+        ab.setDisplayShowHomeEnabled(true);
+
+
+
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new PlaceholderFragment())
+                    .add(R.id.container, new ForecastFragment())
                     .commit();
         }
+
     }
 
     @Override
@@ -49,27 +53,5 @@ public class MainActivity extends ActionBarActivity {
     /**
      * A placeholder fragment containing a simple view.
      */
-    public static class PlaceholderFragment extends Fragment {
 
-        public PlaceholderFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-
-            ArrayList<String> forecastItems = new ArrayList<String>();
-
-            forecastItems.add("Today-Sunny-88/63");
-            forecastItems.add("Tomorrow-Cloudy-68/54");
-            forecastItems.add("Wednesday-Rainy-60/49");
-            forecastItems.add("Thursday-Cloudy-65/56");
-            forecastItems.add("Friday-Sunny-94/77");
-            forecastItems.add("Saturday-Cloudy-75/63");
-            forecastItems.add("Sunday-Rainy-59/45");
-
-            return rootView;
-        }
-    }
 }
