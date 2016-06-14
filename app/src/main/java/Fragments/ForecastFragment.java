@@ -1,5 +1,6 @@
-package com.example.android.sunshine.app;
+package Fragments;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -12,8 +13,16 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
+
+import com.example.android.sunshine.app.DetailActivity;
+import com.example.android.sunshine.app.R;
+import com.example.android.sunshine.app.SettingsActivity;
+
+import Util.WeatherForecastParser;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -26,6 +35,8 @@ import java.util.ArrayList;
 
 /**
  * Created by neema on 2016-06-01.
+ *
+ * Fragment class that displays the main page UI
  */
 public class ForecastFragment extends Fragment {
 
@@ -36,10 +47,12 @@ public class ForecastFragment extends Fragment {
     public ForecastFragment() {
     }
 
-    private void foo() {
-
-    }
-
+    /***********************************************************************************************
+     * Called when the fragment instance is created, setHasOptionsMenu is set to true so that the
+     * fragment can provide a menu item to the main activity's menu
+     *
+     *
+     **********************************************************************************************/
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,6 +60,10 @@ public class ForecastFragment extends Fragment {
         setHasOptionsMenu(true);
     }
 
+    /*********************************************************************************************
+     * Attaches the refresh menu item to the menu bar
+     *
+     **********************************************************************************************/
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 
@@ -55,23 +72,37 @@ public class ForecastFragment extends Fragment {
 
     }
 
+    /**********************************************************************************************
+
+     If the refresh button is selected, a new fetch weather task is created and run.
+
+     **********************************************************************************************/
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
             new fetchWeatherTask().execute("V7N1R2");
+        }else if (id == R.id.action_settings){
+
+            Intent intent = new Intent(getActivity().getApplicationContext(), SettingsActivity.class);
+            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);
     }
+
+    /*********************************************************************************************
+     * Updates the UI to display the layout in layout/fragment_main.xml
+     *
+     * Creates the array adapter that will populate the list view
+     **********************************************************************************************/
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-
 
         arrayAdapter = new ArrayAdapter<String>(getActivity(),
                 R.layout.list_item_forecast,
@@ -80,12 +111,45 @@ public class ForecastFragment extends Fragment {
 
         ListView list = (ListView) rootView.findViewById(R.id.listview_forecast);
 
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            /***************************************************************************************
+             Create a new Toast that displays the contents of the view inside of the list view
+             **************************************************************************************/
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id){
+
+                TextView textView = (TextView) view.findViewById(R.id.list_item_forecast_textview);
+                CharSequence text = textView.getText();
+//
+//                Context context = getActivity().getApplicationContext();
+//                int duration = Toast.LENGTH_LONG;
+//
+//                Toast toast = Toast.makeText(context, text, duration);
+//                toast.show();
+
+                Intent intent = new Intent(getActivity().getApplicationContext(), DetailActivity.class);
+                intent.putExtra(Intent.EXTRA_TEXT, (String) text );
+                startActivity(intent);
+
+            }
+        });
+
         list.setAdapter(arrayAdapter);
+
 
         return rootView;
     }
 
-
+    /**********************************************************************************************
+     *
+     * Helper Class that represents a task to query the openweathermap API and return a 7 day
+     * weather forecast encoded in json format.
+     *
+     * Outputs an array of strings that will populate the text in each row of the ListView
+     *
+     *
+     **********************************************************************************************/
     private class fetchWeatherTask extends AsyncTask<String, Void, String[]> {
 
         private final static String LOG_TAG = "fetchWeatherTask";
@@ -179,7 +243,7 @@ public class ForecastFragment extends Fragment {
                     }
                 }
             }
-
+            //parse the json data
             WeatherForecastParser parser = new WeatherForecastParser(forecastJsonStr);
             int maxTemp;
             int minTemp;
@@ -188,6 +252,7 @@ public class ForecastFragment extends Fragment {
             String day;
             String[] output = new String[days];
 
+            //create an output string for each day
             for (int i = 0; i <= days - 1; i++) {
 
                 Time dayTime = new Time();
@@ -201,8 +266,11 @@ public class ForecastFragment extends Fragment {
                 dateTime = dayTime.setJulianDay(julianStartDay+i);
                 day = getReadableDateString(dateTime);
 
+                //daily maximum temperature
                 maxTemp = parser.getTemp(WeatherForecastParser.MAX_TEMP, i);
+                //daily minimum temperature
                 minTemp = parser.getTemp(WeatherForecastParser.MIN_TEMP, i);
+                //general description of the weather
                 main = parser.getMain(i);
 
                 entry = day + " - " + main + " - " + (maxTemp) + "/" + (minTemp);
@@ -217,15 +285,16 @@ public class ForecastFragment extends Fragment {
 
         protected void onPostExecute(String[] array) {
 
-            if (array != null && array.length == days) {
+            if (array.length == days) {
 
-                arrayAdapter.clear();
+                forecastItems.clear();
 
                 for (int i = 0; i <= days - 1; i++) {
 
-                    arrayAdapter.add(array[i]);
+                    forecastItems.add(array[i]);
 
                 }
+                arrayAdapter.notifyDataSetChanged();
             }
         }
     }

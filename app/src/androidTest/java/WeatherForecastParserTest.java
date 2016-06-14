@@ -1,19 +1,12 @@
 import android.support.test.runner.AndroidJUnit4;
-import android.test.suitebuilder.annotation.SmallTest;
 
-import com.example.android.sunshine.app.WeatherForecastParser;
+import Util.WeatherForecastParser;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import org.junit.runner.RunWith;
-import org.junit.runners.Suite;import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
 
 /**
  * Created by neema on 2016-06-05.
